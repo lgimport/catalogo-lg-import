@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LG Import - Catálogo Exclusivo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coquettePink: '#ff69b4',
+                        hotPink: '#ff1493',
+                        softPink: '#ffe4e1',
+                        lightPinkBg: '#fff0f5',
+                        darkBg: '#121212',
+                        cardBg: '#faf8f5',
+                        accentGray: '#e5e7eb'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        magazine: ['"UnifrakturMaguntia"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+        }
+        .magazine-title {
+            font-family: 'UnifrakturMaguntia', serif;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff69b4;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-coquettePink selection:text-white">
+
+    <!-- Barra Superior / Anuncio -->
+    <div class="bg-neutral-900 text-white text-xs py-2 px-4 text-center tracking-widest font-medium uppercase border-b border-pink-500/20 flex justify-between items-center px-6">
+        <span>✨ IMPORTADOS • 3 CUOTAS SIN INTERÉS • Envíos a todo el país ✨</span>
+        <button onclick="toggleCartModal(true)" class="bg-coquettePink text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-cart-shopping"></i> Carrito (<span id="cartCount">0</span>)
+        </button>
+    </div>
+
+    <!-- Header & Banner Aesthetic -->
+    <header class="relative bg-black text-white overflow-hidden border-b-4 border-coquettePink">
+        <div id="headerBgImage" class="absolute inset-0 opacity-75 bg-cover bg-center pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=80');"></div>
+        <div class="absolute inset-0 bg-black/40"></div>
+        
+        <div class="absolute top-4 right-6 bg-coquettePink text-white text-[10px] sm:text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg tracking-wider transform rotate-3 animate-pulse z-10">
+            🎀 LA TIENDA DE LAS GIRLS
+        </div>
+        <div class="absolute top-12 left-6 hidden sm:block bg-white/90 text-black text-xs px-3 py-1 rounded-md font-serif italic shadow-md transform -rotate-2 z-10">
+            "sorry, I'm a power girl" xoxo
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-24 flex flex-col items-center text-center">
+            <div onclick="checkAdminAccess()" class="mb-6 p-6 bg-neutral-950/80 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 transform hover:scale-105 transition duration-300 cursor-pointer" title="Hacer clic para ingresar al panel de administración">
+                <h1 class="font-serif font-bold text-white tracking-tight flex items-baseline justify-center gap-3">
+                    <span class="text-coquettePink font-magazine text-6xl sm:text-8xl leading-none">lg.</span> 
+                    <span class="text-2xl sm:text-4xl tracking-[0.2em] uppercase font-light text-neutral-300">IMPORT</span>
+                </h1>
+                <p class="text-[11px] tracking-[0.4em] uppercase text-neutral-400 mt-2 font-semibold">Exclusividad & Estilo</p>
+            </div>
+
+            <div class="flex flex-wrap gap-4 justify-center items-center mt-2">
+                <a href="#catalogo" class="bg-coquettePink hover:bg-hotPink text-white font-medium px-6 py-3 rounded-full shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-bag-shopping"></i> Ver Catálogo de Productos
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Catalog Container -->
+    <main id="catalogo" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-neutral-900 p-4 rounded-2xl shadow-sm border border-neutral-800">
+            <div class="relative w-full md:w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-neutral-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Buscar producto por nombre..." class="w-full pl-11 pr-4 py-3 bg-neutral-950 border border-neutral-800 text-white placeholder-neutral-500 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coquettePink transition">
+            </div>
+            <div id="categoryFilters" class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0"></div>
+        </div>
+
+        <div id="statusMessage" class="hidden mb-6 p-4 rounded-xl text-sm font-medium flex items-center justify-between"></div>
+
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+
+        <div id="emptyState" class="hidden text-center py-20">
+            <div class="inline-block p-4 rounded-full bg-neutral-900 text-coquettePink text-3xl mb-4">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">No se encontraron productos</h3>
+            <p class="text-sm text-neutral-400 mt-1">Probá buscando con otro término.</p>
+        </div>
+    </main>
+
+    <!-- Carrito Flotante Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-neutral-900 text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-neutral-800 relative max-h-[90vh] flex flex-col">
+            <button onclick="toggleCartModal(false)" class="absolute top-5 right-5 text-neutral-400 hover:text-white text-xl w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-neutral-800 text-coquettePink flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold font-serif text-white">Tu Carrito de Compras</h2>
+                    <p class="text-xs text-neutral-400">Revisá tus productos antes de enviar el pedido</p>
+                </div>
+            </div>
+            <div id="cartItemsList" class="divide-y divide-neutral-800 flex-grow overflow-y-auto my-4 pr-1"></div>
+            <div class="border-t border-neutral-800 pt-4 mt-auto space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-neutral-400">Total ítems:</span>
+                    <span class="font-bold text-white" id="cartTotalItems">0</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="toggleCartModal(false)" class="w-1/2 bg-neutral-800 hover:bg-neutral-700 text-white font-medium py-3 px-4 rounded-xl text-xs transition">
+                        Seguir Comprando
+                    </button>
+                    <button onclick="checkoutWhatsApp()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg transition">
+                        <i class="fa-brands fa-whatsapp text-base"></i> Cerrar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Modal Panel -->
+    <div id="adminModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-neutral-900 text-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-neutral-800 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-neutral-800 text-coquettePink flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold font-serif text-white">Panel de Administración Exclusivo</h2>
+                        <p class="text-xs text-neutral-400">Gestión interna de LG Import®</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="#catalogo" onclick="toggleAdminModal(false)" class="bg-coquettePink hover:bg-hotPink text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-eye"></i> Ver Web en Vivo
+                    </a>
+                    <button onclick="toggleAdminModal(false)" class="text-neutral-400 hover:text-white text-xl w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-neutral-800 mb-6 overflow-x-auto">
+                <button onclick="switchTab('manual')" id="tabManual" class="pb-3 px-4 text-sm font-semibold border-b-2 border-coquettePink text-coquettePink whitespace-nowrap transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Carga / Editar Producto
+                </button>
+                <button onclick="switchTab('list')" id="tabList" class="pb-3 px-4 text-sm font-semibold text-neutral-400 border-b-2 border-transparent hover:text-white whitespace-nowrap transition">
+                    <i class="fa-solid fa-list mr-1"></i> Gestionar Listado
+                </button>
+                <button onclick="switchTab('bg')" id="tabBg" class="pb-3 px-4 text-sm font-semibold text-neutral-400 border-b-2 border-transparent hover:text-white whitespace-nowrap transition">
+                    <i class="fa-solid fa-image mr-1"></i> Cambiar Fondo
+                </button>
+            </div>
+
+            <!-- Tab 1: Manual / Edición -->
+            <div id="sectionManual" class="space-y-4">
+                <form id="productForm" onsubmit="handleProductSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="editIndex" value="-1">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Título del Producto *</label>
+                        <input type="text" id="prodTitle" required class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink" placeholder="Ej: Cartera Coquette Rosa">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Costo del Producto ($) *</label>
+                            <input type="number" id="prodCost" required class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink" placeholder="Ej: 10000">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Ganancia Limpia Deseada ($) *</label>
+                            <input type="number" id="prodProfit" required class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink" placeholder="Ej: 15000">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Categoría *</label>
+                            <select id="prodCategorySelect" onchange="handleCategorySelectChange()" class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink mb-2">
+                                <option value="">Seleccionar existente...</option>
+                                <option value="__new__">+ Nueva Categoría</option>
+                            </select>
+                            <input type="text" id="prodCategoryNew" class="hidden w-full px-4 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink" placeholder="Escribí la nueva categoría...">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Subcategoría</label>
+                            <select id="prodSubcategorySelect" onchange="handleSubcategorySelectChange()" class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink mb-2">
+                                <option value="">Seleccionar existente...</option>
+                                <option value="__new__">+ Nueva Subcategoría</option>
+                            </select>
+                            <input type="text" id="prodSubcategoryNew" class="hidden w-full px-4 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink" placeholder="Escribí la nueva subcategoría...">
+                        </div>
+                    </div>
+
+                    <!-- Enlaces Multimedia (URLs de fotos o videos) -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Enlaces Multimedia (URLs separadas por comas o saltos de línea) *</label>
+                        <textarea id="prodMediaUrls" rows="3" required class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink mb-2" placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/video1.mp4"></textarea>
+                        <p class="text-[11px] text-neutral-500">Copiá y pegá los links directos de tus fotos o videos (ideal para mantener la web súper liviana y rápida).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Descripción</label>
+                        <textarea id="prodDesc" rows="3" class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink" placeholder="Detalles..."></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="resetForm()" class="px-5 py-2.5 rounded-xl border border-neutral-800 text-neutral-300 text-sm font-medium hover:bg-neutral-800 transition">Limpiar</button>
+                        <button type="submit" id="submitBtn" class="px-6 py-2.5 rounded-xl bg-coquettePink hover:bg-hotPink text-white text-sm font-medium shadow-md transition">Guardar Producto</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab 2: List -->
+            <div id="sectionList" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-sm font-bold text-white">Listado Actual de Productos</h4>
+                    <button onclick="clearAllProducts()" class="text-xs bg-red-950/60 text-red-400 border border-red-900 font-medium px-3 py-1.5 rounded-lg hover:bg-red-900/60 transition">Borrar Todo</button>
+                </div>
+                <div id="adminProductsList" class="divide-y divide-neutral-800 max-h-96 overflow-y-auto pr-2"></div>
+            </div>
+
+            <!-- Tab 3: Cambiar Fondo -->
+            <div id="sectionBg" class="hidden space-y-4">
+                <h4 class="text-sm font-bold text-white mb-2">Subir tu foto de fondo para el encabezado</h4>
+                <p class="text-xs text-neutral-400 mb-4">Seleccioná la imagen collage desde tu dispositivo para establecerla como fondo.</p>
+                <div class="border-2 border-dashed border-neutral-800 hover:border-coquettePink rounded-2xl p-8 text-center transition bg-neutral-950">
+                    <input type="file" id="bgImageFile" accept="image/*" class="hidden" onchange="handleBgUpload(event)">
+                    <label for="bgImageFile" class="cursor-pointer flex flex-col items-center">
+                        <div class="w-14 h-14 rounded-full bg-neutral-900 text-coquettePink flex items-center justify-center text-xl mb-3 shadow-sm">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-white">Subir foto de fondo desde tu celu o compu</span>
+                    </label>
+                </div>
+                <button onclick="resetDefaultBg()" class="w-full mt-2 text-xs border border-neutral-800 py-2 rounded-xl text-neutral-400 hover:bg-neutral-800 transition">Restaurar fondo por defecto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-neutral-950 text-white border-t border-neutral-900 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <h2 class="text-3xl font-serif font-bold text-white tracking-tight flex items-center gap-2">
+                    <span class="text-coquettePink font-magazine">lg.</span> IMPORT
+                </h2>
+                <p class="text-xs text-neutral-400 mt-1 tracking-widest uppercase">Web Oficial de LG IMPORT® </p>
+            </div>
+            <div class="text-xs text-neutral-400 text-center md:text-right">
+                <p>© 2026 LG Import. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        const defaultProducts = [
+            {
+                title: "Cartera Coquette Charol Negra con Moño",
+                cost: 10000,
+                profit: 25000,
+                category: "Carteras",
+                subcategory: "Bolsos",
+                mediaList: [
+                    { type: 'image', url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80' }
+                ],
+                description: "Diseño exclusivo importado en charol con detalle de moño frontal satinado y cadena metálica."
+            }
+        ];
+
+        let products = [];
+        let cart = [];
+        let currentCategory = 'Todos';
+        const whatsappNumber = "5492665329231";
+
+        window.onload = function() {
+            loadProducts();
+            loadCustomBg();
+            updateCategoryDropdowns();
+            renderCategories();
+            renderProducts();
+            updateCartCount();
+        };
+
+        function calculatePrices(cost, profit) {
+            const c = parseFloat(cost) || 0;
+            const p = parseFloat(profit) || 0;
+            const baseTotal = c + p;
+            const listPrice = Math.ceil(baseTotal / 0.81971);
+            const transferPrice = Math.ceil(listPrice * 0.85);
+            const installmentPrice = Math.ceil(listPrice / 3);
+            return { listPrice, transferPrice, installmentPrice };
+        }
+
+        function checkAdminAccess() {
+            const pass = prompt("Ingrese la contraseña de administración:");
+            if (pass === "0503Dios") {
+                toggleAdminModal(true);
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function loadProducts() {
+            const saved = localStorage.getItem('lg_import_products');
+            if (saved) {
+                try {
+                    products = JSON.parse(saved);
+                    products = products.map(p => {
+                        if (!p.mediaList && p.image) {
+                            p.mediaList = [{ type: p.mediaType || 'image', url: p.image }];
+                        }
+                        return p;
+                    });
+                } catch(e) {
+                    products = defaultProducts;
+                }
+            } else {
+                products = defaultProducts;
+            }
+        }
+
+        function saveProductsToStorage() {
+            try {
+                localStorage.setItem('lg_import_products', JSON.stringify(products));
+                return true;
+            } catch (e) {
+                alert('Error al guardar en el almacenamiento local.');
+                return false;
+            }
+        }
+
+        function loadCustomBg() {
+            const savedBg = localStorage.getItem('lg_import_custom_bg');
+            if (savedBg) {
+                document.getElementById('headerBgImage').style.backgroundImage = `url('${savedBg}')`;
+            }
+        }
+
+        function handleBgUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('lg_import_custom_bg', e.target.result);
+                    document.getElementById('headerBgImage').style.backgroundImage = `url('${e.target.result}')`;
+                    toggleAdminModal(false);
+                    showNotification('¡Fondo actualizado con éxito!', 'success');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetDefaultBg() {
+            localStorage.removeItem('lg_import_custom_bg');
+            document.getElementById('headerBgImage').style.backgroundImage = `url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=80')`;
+            toggleAdminModal(false);
+            showNotification('Fondo restaurado al predeterminado.', 'info');
+        }
+
+        function updateCategoryDropdowns(selectedCat = '', selectedSub = '') {
+            const catSelect = document.getElementById('prodCategorySelect');
+            const subSelect = document.getElementById('prodSubcategorySelect');
+
+            const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+            const subcategories = [...new Set(products.map(p => p.subcategory).filter(Boolean))];
+
+            catSelect.innerHTML = '<option value="">Seleccionar existente...</option><option value="__new__">+ Nueva Categoría</option>' +
+                categories.map(c => `<option value="${c}" ${c === selectedCat ? 'selected' : ''}>${c}</option>`).join('');
+
+            subSelect.innerHTML = '<option value="">Seleccionar existente...</option><option value="__new__">+ Nueva Subcategoría</option>' +
+                subcategories.map(s => `<option value="${s}" ${s === selectedSub ? 'selected' : ''}>${s}</option>`).join('');
+
+            if (selectedCat && !categories.includes(selectedCat)) {
+                catSelect.value = '__new__';
+                document.getElementById('prodCategoryNew').value = selectedCat;
+                document.getElementById('prodCategoryNew').classList.remove('hidden');
+            } else {
+                document.getElementById('prodCategoryNew').classList.add('hidden');
+                document.getElementById('prodCategoryNew').value = '';
+            }
+
+            if (selectedSub && !subcategories.includes(selectedSub)) {
+                subSelect.value = '__new__';
+                document.getElementById('prodSubcategoryNew').value = selectedSub;
+                document.getElementById('prodSubcategoryNew').classList.remove('hidden');
+            } else {
+                document.getElementById('prodSubcategoryNew').classList.add('hidden');
+                document.getElementById('prodSubcategoryNew').value = '';
+            }
+        }
+
+        function handleCategorySelectChange() {
+            const val = document.getElementById('prodCategorySelect').value;
+            const inputNew = document.getElementById('prodCategoryNew');
+            if (val === '__new__') {
+                inputNew.classList.remove('hidden');
+                inputNew.focus();
+            } else {
+                inputNew.classList.add('hidden');
+                inputNew.value = '';
+            }
+        }
+
+        function handleSubcategorySelectChange() {
+            const val = document.getElementById('prodSubcategorySelect').value;
+            const inputNew = document.getElementById('prodSubcategoryNew');
+            if (val === '__new__') {
+                inputNew.classList.remove('hidden');
+                inputNew.focus();
+            } else {
+                inputNew.classList.add('hidden');
+                inputNew.value = '';
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryFilters');
+            const categories = ['Todos', ...new Set(products.map(p => p.category).filter(Boolean))];
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${currentCategory === cat ? 'bg-white text-black shadow-md' : 'bg-neutral-950 text-neutral-300 hover:bg-neutral-800'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            renderCategories();
+            filterProducts();
+        }
+
+        function filterProducts() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            const filtered = products.filter(p => {
+                const matchesCat = currentCategory === 'Todos' || (p.category && p.category.toLowerCase() === currentCategory.toLowerCase());
+                const matchesSearch = p.title.toLowerCase().includes(searchVal) || (p.description && p.description.toLowerCase().includes(searchVal)) || (p.subcategory && p.subcategory.toLowerCase().includes(searchVal));
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(product => {
+                const prices = calculatePrices(product.cost, product.profit);
+                const message = encodeURIComponent(`Hola! Me interesa este producto: *${product.title}* (Lista 3 cuotas: $${prices.listPrice.toLocaleString()} / Transferencia 15% desc: $${prices.transferPrice.toLocaleString()}). ¿Hay stock? 🎀`);
+                const waLink = `https://wa.me/${whatsappNumber}?text=${message}`;
+
+                const primaryMedia = product.mediaList && product.mediaList.length > 0 ? product.mediaList[0] : { type: 'image', url: 'https://placehold.co/600x600/121212/ff69b4?text=LG+Import' };
+                let mediaHTML = '';
+                if (primaryMedia.type === 'video') {
+                    mediaHTML = `<video src="${primaryMedia.url}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`;
+                } else {
+                    mediaHTML = `<img src="${primaryMedia.url}" alt="${product.title}" onerror="this.src='https://placehold.co/600x600/121212/ff69b4?text=LG+Import'" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500">`;
+                }
+
+                return `
+                    <div class="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="relative h-64 overflow-hidden bg-neutral-950">
+                                ${mediaHTML}
+                                <span class="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md text-white text-[10px] font-bold uppercase px-3 py-1 rounded-full shadow border border-neutral-800">
+                                    ${product.category} ${product.subcategory ? '• ' + product.subcategory : ''}
+                                </span>
+                            </div>
+                            <div class="p-5">
+                                <h3 class="font-serif font-bold text-white text-base mb-1 line-clamp-1 group-hover:text-coquettePink transition">${product.title}</h3>
+                                <p class="text-xs text-neutral-400 line-clamp-2 mb-4 leading-relaxed">${product.description || 'Sin descripción adicional.'}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 flex flex-col gap-3">
+                            <div class="bg-neutral-950 p-3 rounded-xl border border-neutral-800 space-y-1">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-neutral-400">💳 3 Cuotas sin interés:</span>
+                                    <span class="font-bold text-white text-sm">$${prices.listPrice.toLocaleString()}</span>
+                                </div>
+                                <div class="text-[11px] text-neutral-400 text-right pb-1 border-b border-neutral-800">
+                                    (3 cuotas de $${prices.installmentPrice.toLocaleString()})
+                                </div>
+                                <div class="flex items-center justify-between text-xs pt-1">
+                                    <span class="text-coquettePink font-medium">✨ Transferencia (15% off):</span>
+                                    <span class="font-bold text-coquettePink text-sm">$${prices.transferPrice.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <button onclick="addToCart('${product.title.replace(/'/g, "\\'")}', ${prices.listPrice}, ${prices.transferPrice})" class="w-full bg-coquettePink hover:bg-hotPink text-white font-medium py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition transform active:scale-95">
+                                <i class="fa-solid fa-cart-plus"></i> Añadir al Carrito
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addToCart(title, listPrice, transferPrice) {
+            cart.push({ title, listPrice, transferPrice });
+            updateCartCount();
+            showNotification(`¡"${title}" agregado al carrito!`, 'success');
+        }
+
+        function updateCartCount() {
+            document.getElementById('cartCount').innerText = cart.length;
+        }
+
+        function toggleCartModal(show) {
+            const modal = document.getElementById('cartModal');
+            if (show) {
+                renderCartItems();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItemsList');
+            document.getElementById('cartTotalItems').innerText = cart.length;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-xs text-neutral-400 text-center py-8">Tu carrito está vacío.</p>`;
+                return;
+            }
+
+            container.innerHTML = cart.map((item, idx) => `
+                <div class="py-3 flex justify-between items-center text-xs">
+                    <div>
+                        <h5 class="font-bold text-white">${item.title}</h5>
+                        <span class="text-neutral-400">Lista: $${item.listPrice.toLocaleString()} | Transf: $${item.transferPrice.toLocaleString()}</span>
+                    </div>
+                    <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            updateCartCount();
+            renderCartItems();
+        }
+
+        function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert('El carrito está vacío.');
+                return;
+            }
+
+            let text = `Hola! Quiero cerrar este pedido y consultar stock: 🎀\n\n`;
+            let totalList = 0;
+            let totalTransf = 0;
+
+            cart.forEach((item, i) => {
+                text += `${i + 1}. *${item.title}*\n   - 3 Cuotas: $${item.listPrice.toLocaleString()}\n   - Transferencia: $${item.transferPrice.toLocaleString()}\n\n`;
+                totalList += item.listPrice;
+                totalTransf += item.transferPrice;
+            });
+
+            text += `--------------------------\n`;
+            text += `*Total 3 Cuotas:* $${totalList.toLocaleString()}\n`;
+            text += `*Total Transferencia (15% off):* $${totalTransf.toLocaleString()}\n`;
+            text += `\n¿Me confirmás stock disponible?`;
+
+            const encoded = encodeURIComponent(text);
+            window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
+        }
+
+        function toggleAdminModal(show) {
+            const modal = document.getElementById('adminModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                renderAdminList();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tab) {
+            const manualSec = document.getElementById('sectionManual');
+            const listSec = document.getElementById('sectionList');
+            const bgSec = document.getElementById('sectionBg');
+            const tabs = ['tabManual', 'tabList', 'tabBg'];
+
+            tabs.forEach(t => {
+                const el = document.getElementById(t);
+                el.classList.remove('border-coquettePink', 'text-coquettePink');
+                el.classList.add('border-transparent', 'text-neutral-400');
+            });
+            [manualSec, listSec, bgSec].forEach(s => s.classList.add('hidden'));
+
+            if (tab === 'manual') {
+                document.getElementById('tabManual').classList.add('border-coquettePink', 'text-coquettePink');
+                manualSec.classList.remove('hidden');
+            } else if (tab === 'list') {
+                document.getElementById('tabList').classList.add('border-coquettePink', 'text-coquettePink');
+                listSec.classList.remove('hidden');
+                renderAdminList();
+            } else if (tab === 'bg') {
+                document.getElementById('tabBg').classList.add('border-coquettePink', 'text-coquettePink');
+                bgSec.classList.remove('hidden');
+            }
+        }
+
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+            const title = document.getElementById('prodTitle').value.trim();
+            const cost = parseFloat(document.getElementById('prodCost').value) || 0;
+            const profit = parseFloat(document.getElementById('prodProfit').value) || 0;
+            
+            let category = document.getElementById('prodCategorySelect').value;
+            if (category === '__new__') {
+                category = document.getElementById('prodCategoryNew').value.trim();
+            }
+
+            let subcategory = document.getElementById('prodSubcategorySelect').value;
+            if (subcategory === '__new__') {
+                subcategory = document.getElementById('prodSubcategoryNew').value.trim();
+            }
+
+            const rawUrls = document.getElementById('prodMediaUrls').value.trim();
+            const description = document.getElementById('prodDesc').value.trim();
+
+            if (!rawUrls) {
+                alert('Debes ingresar al menos una URL de imagen o video.');
+                return;
+            }
+
+            // Procesar las URLs separadas por comas o saltos de línea
+            const urlsArray = rawUrls.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
+            const mediaList = urlsArray.map(url => {
+                const isVid = url.endsWith('.mp4') || url.includes('video') || url.includes('.webm');
+                return { type: isVid ? 'video' : 'image', url: url };
+            });
+
+            const newProd = { 
+                title, 
+                cost, 
+                profit, 
+                category: category || 'General', 
+                subcategory, 
+                mediaList, 
+                description 
+            };
+
+            if (editIndex >= 0) {
+                products[editIndex] = newProd;
+                showNotification('¡Producto actualizado!', 'success');
+            } else {
+                products.unshift(newProd);
+                showNotification('¡Producto agregado!', 'success');
+            }
+
+            if (saveProductsToStorage()) {
+                updateCategoryDropdowns();
+                renderCategories();
+                filterProducts();
+                resetForm();
+                switchTab('list');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('submitBtn').innerText = 'Guardar Producto';
+            updateCategoryDropdowns();
+        }
+
+        function renderAdminList() {
+            const container = document.getElementById('adminProductsList');
+            if (products.length === 0) {
+                container.innerHTML = `<p class="text-xs text-neutral-400 text-center py-6">No hay productos cargados.</p>`;
+                return;
+            }
+            container.innerHTML = products.map((p, index) => {
+                const prices = calculatePrices(p.cost, p.profit);
+                const thumb = p.mediaList && p.mediaList.length > 0 ? p.mediaList[0] : { type: 'image', url: '' };
+                return `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            ${thumb.type === 'video' ? '<div class="w-10 h-10 rounded-lg bg-neutral-950 flex items-center justify-center text-coquettePink"><i class="fa-solid fa-video"></i></div>' : `<img src="${thumb.url}" class="w-10 h-10 rounded-lg object-cover bg-neutral-950" onerror="this.src='https://placehold.co/100x100'">`}
+                            <div>
+                                <h5 class="text-xs font-bold text-white line-clamp-1">${p.title}</h5>
+                                <span class="text-[10px] text-neutral-400">${p.category} ${p.subcategory ? '• ' + p.subcategory : ''} • Archivos: ${p.mediaList ? p.mediaList.length : 0} | Lista: $${prices.listPrice.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editProduct(${index})" class="p-2 text-neutral-400 hover:text-white transition text-xs" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteProduct(${index})" class="p-2 text-red-400 hover:text-red-300 transition text-xs" title="Borrar"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editProduct(index) {
+            const p = products[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('prodTitle').value = p.title;
+            document.getElementById('prodCost').value = p.cost || 0;
+            document.getElementById('prodProfit').value = p.profit || 0;
+            document.getElementById('prodDesc').value = p.description || '';
+            
+            // Cargar URLs en el textarea separadas por comas
+            const urlsStr = p.mediaList ? p.mediaList.map(m => m.url).join(', ') : '';
+            document.getElementById('prodMediaUrls').value = urlsStr;
+
+            document.getElementById('submitBtn').innerText = 'Actualizar Producto';
+            switchTab('manual');
+            updateCategoryDropdowns(p.category, p.subcategory);
+        }
+
+        function deleteProduct(index) {
+            if (confirm('¿Eliminar producto?')) {
+                products.splice(index, 1);
+                saveProductsToStorage();
+                updateCategoryDropdowns();
+                renderCategories();
+                filterProducts();
+                renderAdminList();
+                showNotification('Producto eliminado.', 'info');
+            }
+        }
+
+        function clearAllProducts() {
+            if (confirm('¿Vaciar todo el catálogo?')) {
+                products = [];
+                saveProductsToStorage();
+                updateCategoryDropdowns();
+                renderCategories();
+                filterProducts();
+                renderAdminList();
+                showNotification('Catálogo vaciado.', 'info');
+            }
+        }
+
+        function showNotification(msg, type) {
+            const banner = document.getElementById('statusMessage');
+            banner.innerText = msg;
+            banner.className = `mb-6 p-4 rounded-xl text-sm font-medium flex items-center justify-between shadow-sm ${type === 'success' ? 'bg-neutral-900 text-hotPink border border-neutral-800' : 'bg-neutral-900 text-white border border-neutral-800'}`;
+            banner.classList.remove('hidden');
+            setTimeout(() => { banner.classList.add('hidden'); }, 4000);
+        }
+    </script>
+</body>
+</html>
