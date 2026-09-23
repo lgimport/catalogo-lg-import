@@ -120,6 +120,75 @@
         </div>
     </main>
 
+    <!-- Modal Ficha de Producto (Estilo Referencia) -->
+    <div id="productModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="bg-neutral-950 text-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-neutral-800 relative max-h-[95vh] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <button onclick="toggleProductModal(false)" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center transition z-20">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Columna Izquierda: Galería Multimedia -->
+            <div class="space-y-4 flex flex-col justify-center">
+                <div id="modalMainMedia" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-black border border-neutral-800 flex items-center justify-center">
+                    <!-- Contenido principal dinámico -->
+                </div>
+                <div id="modalThumbsContainer" class="flex gap-2 overflow-x-auto pb-2">
+                    <!-- Miniaturas dinámicas -->
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Detalles, Precios y Compra -->
+            <div class="space-y-5 flex flex-col justify-between">
+                <div class="space-y-3">
+                    <span id="modalCategoryTag" class="text-[10px] bg-neutral-900 text-coquettePink px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-neutral-800"></span>
+                    <h2 id="modalTitle" class="text-2xl font-bold font-serif text-white leading-tight"></h2>
+                    <p id="modalDesc" class="text-xs text-neutral-300 leading-relaxed whitespace-pre-line"></p>
+
+                    <!-- Caja de Precios Estilo Referencia -->
+                    <div class="bg-neutral-900/90 border border-neutral-800 p-4 rounded-2xl space-y-2">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-white" id="modalListPrice"></div>
+                        <div class="text-xs text-neutral-300" id="modalInstallmentText"></div>
+                        <div class="text-sm font-bold text-coquettePink pt-1" id="modalTransferPrice"></div>
+                    </div>
+
+                    <!-- Opciones de Talle y Color -->
+                    <div class="space-y-3 pt-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Talle</label>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="selectOption('talle', 'S/M', this)" class="talle-btn px-4 py-2 rounded-xl bg-white text-black text-xs font-bold transition">S/M</button>
+                                <button type="button" onclick="selectOption('talle', 'L/XL', this)" class="talle-btn px-4 py-2 rounded-xl bg-neutral-900 text-neutral-300 text-xs font-bold border border-neutral-800 transition">L/XL</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Color / Modelo</label>
+                            <button type="button" class="px-4 py-2 rounded-xl bg-neutral-900 text-white text-xs font-bold border border-coquettePink">Estándar</button>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Cantidad</label>
+                            <div class="flex items-center w-32 bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                                <button onclick="changeQty(-1)" class="px-3 py-2 text-neutral-400 hover:text-white transition">-</button>
+                                <span id="modalQty" class="flex-grow text-center text-xs font-bold text-white">1</span>
+                                <button onclick="changeQty(1)" class="px-3 py-2 text-neutral-400 hover:text-white transition">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción Finales -->
+                <div class="space-y-3 pt-4 border-t border-neutral-800">
+                    <button onclick="toggleProductModal(false)" class="w-full bg-neutral-900 hover:bg-neutral-800 text-neutral-300 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 border border-neutral-800 transition">
+                        <i class="fa-solid fa-bag-shopping"></i> Seguir Comprando
+                    </button>
+                    <button onclick="checkoutModalWhatsApp()" class="w-full bg-[#25d366] hover:bg-[#20ba5a] text-black font-extrabold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
+                        <i class="fa-brands fa-whatsapp text-base"></i> Cerrar Pedido por WhatsApp
+                    </button>
+                    <p class="text-[10px] text-neutral-500 text-center uppercase tracking-wider">✈️ Despacho directo a todo el país</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Carrito Flotante Modal -->
     <div id="cartModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-neutral-900 text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-neutral-800 relative max-h-[90vh] flex flex-col">
@@ -189,7 +258,7 @@
                 </button>
             </div>
 
-            <!-- Tab 1: Manual / Edición con Carga de Archivos Locales -->
+            <!-- Tab 1: Manual / Edición -->
             <div id="sectionManual" class="space-y-4">
                 <form id="productForm" onsubmit="handleProductSubmit(event)" class="space-y-4">
                     <input type="hidden" id="editIndex" value="-1">
@@ -226,9 +295,9 @@
                         </div>
                     </div>
 
-                    <!-- Carga Múltiple de Archivos desde Dispositivo -->
+                    <!-- Carga Múltiple Directa -->
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Seleccionar Fotos y Videos de la PC / Celular (Múltiples) *</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Seleccionar Fotos y Videos (Múltiples) *</label>
                         <input type="file" id="prodLocalFiles" accept="image/*,video/*" multiple onchange="handleLocalFilesInput(event)" class="text-xs text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-800 file:text-white hover:file:bg-neutral-700 cursor-pointer mb-2">
                         <div id="mediaPreviewContainer" class="grid grid-cols-4 gap-2 bg-neutral-950 p-3 rounded-xl border border-neutral-800 max-h-48 overflow-y-auto">
                             <p class="text-[11px] text-neutral-500 col-span-4 text-center py-4">Seleccioná varios archivos para organizarlos aquí.</p>
@@ -308,6 +377,9 @@
         let cart = [];
         let currentCategory = 'Todos';
         let currentEditingMedia = [];
+        let currentSelectedProduct = null;
+        let selectedTalle = 'S/M';
+        let productQty = 1;
         const whatsappNumber = "5492665329231";
 
         window.onload = function() {
@@ -362,7 +434,7 @@
                 localStorage.setItem('lg_import_products', JSON.stringify(products));
                 return true;
             } catch (e) {
-                alert('El espacio de almacenamiento local está lleno. Probá subiendo archivos un poco más livianos.');
+                alert('El espacio de almacenamiento local está lleno.');
                 return false;
             }
         }
@@ -382,7 +454,7 @@
                     localStorage.setItem('lg_import_custom_bg', e.target.result);
                     document.getElementById('headerBgImage').style.backgroundImage = `url('${e.target.result}')`;
                     toggleAdminModal(false);
-                    showNotification('¡Fondo actualizado con éxito!', 'success');
+                    showNotification('¡Fondo de banner actualizado con éxito!', 'success');
                 }
                 reader.readAsDataURL(file);
             }
@@ -395,7 +467,6 @@
             showNotification('Fondo restaurado al predeterminado.', 'info');
         }
 
-        // Carga múltiple directa de archivos desde el dispositivo
         function handleLocalFilesInput(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -540,11 +611,8 @@
             }
 
             emptyState.classList.add('hidden');
-            grid.innerHTML = filtered.map(product => {
+            grid.innerHTML = filtered.map((product, pIndex) => {
                 const prices = calculatePrices(product.cost, product.profit);
-                const message = encodeURIComponent(`Hola! Me interesa este producto: *${product.title}* (Lista 3 cuotas: $${prices.listPrice.toLocaleString()} / Transferencia 15% desc: $${prices.transferPrice.toLocaleString()}). ¿Hay stock? 🎀`);
-                const waLink = `https://wa.me/${whatsappNumber}?text=${message}`;
-
                 const primaryMedia = product.mediaList && product.mediaList.length > 0 ? product.mediaList[0] : { type: 'image', url: 'https://placehold.co/600x600/121212/ff69b4?text=LG+Import' };
                 let mediaHTML = '';
                 if (primaryMedia.type === 'video') {
@@ -554,7 +622,7 @@
                 }
 
                 return `
-                    <div class="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                    <div onclick="openProductModal(${pIndex})" class="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer">
                         <div>
                             <div class="relative h-64 overflow-hidden bg-neutral-950">
                                 ${mediaHTML}
@@ -581,13 +649,90 @@
                                     <span class="font-bold text-coquettePink text-sm">$${prices.transferPrice.toLocaleString()}</span>
                                 </div>
                             </div>
-                            <button onclick="addToCart('${product.title.replace(/'/g, "\\'")}', ${prices.listPrice}, ${prices.transferPrice})" class="w-full bg-coquettePink hover:bg-hotPink text-white font-medium py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition transform active:scale-95">
-                                <i class="fa-solid fa-cart-plus"></i> Añadir al Carrito
-                            </button>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        // Lógica de la Ficha de Producto (Modal)
+        function openProductModal(index) {
+            currentSelectedProduct = products[index];
+            productQty = 1;
+            selectedTalle = 'S/M';
+            document.getElementById('modalQty').innerText = productQty;
+
+            document.getElementById('modalCategoryTag').innerText = `${currentSelectedProduct.category} ${currentSelectedProduct.subcategory ? '• ' + currentSelectedProduct.subcategory : ''}`;
+            document.getElementById('modalTitle').innerText = currentSelectedProduct.title;
+            document.getElementById('modalDesc').innerText = currentSelectedProduct.description || 'Sin descripción detallada.';
+
+            const prices = calculatePrices(currentSelectedProduct.cost, currentSelectedProduct.profit);
+            document.getElementById('modalListPrice').innerText = `$${prices.listPrice.toLocaleString()}`;
+            document.getElementById('modalInstallmentText').innerText = `en 3 cuotas sin interés de $${prices.installmentPrice.toLocaleString()}`;
+            document.getElementById('modalTransferPrice').innerHTML = `✨ $${prices.transferPrice.toLocaleString()} <span class="text-white text-xs">(15% OFF Transferencia)</span>`;
+
+            renderModalMedia(0);
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function toggleProductModal(show) {
+            const modal = document.getElementById('productModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        function renderModalMedia(activeIndex) {
+            if (!currentSelectedProduct || !currentSelectedProduct.mediaList) return;
+            const mediaList = currentSelectedProduct.mediaList;
+            const mainContainer = document.getElementById('modalMainMedia');
+            const thumbsContainer = document.getElementById('modalThumbsContainer');
+
+            const active = mediaList[activeIndex] || mediaList[0];
+            if (active.type === 'video') {
+                mainContainer.innerHTML = `<video src="${active.url}" class="w-full h-full object-contain" controls autoplay></video>`;
+            } else {
+                mainContainer.innerHTML = `<img src="${active.url}" class="w-full h-full object-contain">`;
+            }
+
+            thumbsContainer.innerHTML = mediaList.map((m, idx) => `
+                <div onclick="renderModalMedia(${idx})" class="w-16 h-16 rounded-xl overflow-hidden border-2 ${idx === activeIndex ? 'border-coquettePink' : 'border-neutral-800'} cursor-pointer bg-black flex items-center justify-center flex-shrink-0">
+                    ${m.type === 'video' ? '<i class="fa-solid fa-video text-coquettePink"></i>' : `<img src="${m.url}" class="w-full h-full object-cover">`}
+                </div>
+            `).join('');
+        }
+
+        function selectOption(type, value, el) {
+            if (type === 'talle') {
+                selectedTalle = value;
+                document.querySelectorAll('.talle-btn').forEach(b => {
+                    b.className = "talle-btn px-4 py-2 rounded-xl bg-neutral-900 text-neutral-300 text-xs font-bold border border-neutral-800 transition";
+                });
+                el.className = "talle-btn px-4 py-2 rounded-xl bg-white text-black text-xs font-bold transition";
+            }
+        }
+
+        function changeQty(amount) {
+            productQty += amount;
+            if (productQty < 1) productQty = 1;
+            document.getElementById('modalQty').innerText = productQty;
+        }
+
+        function checkoutModalWhatsApp() {
+            if (!currentSelectedProduct) return;
+            const prices = calculatePrices(currentSelectedProduct.cost, currentSelectedProduct.profit);
+            const subtotalList = prices.listPrice * productQty;
+            const subtotalTransf = prices.transferPrice * productQty;
+
+            let text = `Hola! Quiero cerrar este pedido y consultar stock: 🎀\n\n`;
+            text += `*${currentSelectedProduct.title}*\n`;
+            text += `• Talle: ${selectedTalle}\n`;
+            text += `• Cantidad: ${productQty}\n`;
+            text += `• Precio Listado (3 cuotas): $${subtotalList.toLocaleString()}\n`;
+            text += `• Precio Transferencia (15% off): $${subtotalTransf.toLocaleString()}\n\n`;
+            text += `¿Me confirmás stock disponible?`;
+
+            const encoded = encodeURIComponent(text);
+            window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
         }
 
         function addToCart(title, listPrice, transferPrice) {
