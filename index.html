@@ -189,7 +189,7 @@
                 </button>
             </div>
 
-            <!-- Tab 1: Manual / Edición -->
+            <!-- Tab 1: Manual / Edición con Carga de Archivos Locales -->
             <div id="sectionManual" class="space-y-4">
                 <form id="productForm" onsubmit="handleProductSubmit(event)" class="space-y-4">
                     <input type="hidden" id="editIndex" value="-1">
@@ -226,11 +226,13 @@
                         </div>
                     </div>
 
-                    <!-- Enlaces Multimedia (URLs de fotos o videos) -->
+                    <!-- Carga Múltiple de Archivos desde Dispositivo -->
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Enlaces Multimedia (URLs separadas por comas o saltos de línea) *</label>
-                        <textarea id="prodMediaUrls" rows="3" required class="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-coquettePink mb-2" placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/video1.mp4"></textarea>
-                        <p class="text-[11px] text-neutral-500">Copiá y pegá los links directos de tus fotos o videos (ideal para mantener la web súper liviana y rápida).</p>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Seleccionar Fotos y Videos de la PC / Celular (Múltiples) *</label>
+                        <input type="file" id="prodLocalFiles" accept="image/*,video/*" multiple onchange="handleLocalFilesInput(event)" class="text-xs text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-800 file:text-white hover:file:bg-neutral-700 cursor-pointer mb-2">
+                        <div id="mediaPreviewContainer" class="grid grid-cols-4 gap-2 bg-neutral-950 p-3 rounded-xl border border-neutral-800 max-h-48 overflow-y-auto">
+                            <p class="text-[11px] text-neutral-500 col-span-4 text-center py-4">Seleccioná varios archivos para organizarlos aquí.</p>
+                        </div>
                     </div>
 
                     <div>
@@ -305,6 +307,7 @@
         let products = [];
         let cart = [];
         let currentCategory = 'Todos';
+        let currentEditingMedia = [];
         const whatsappNumber = "5492665329231";
 
         window.onload = function() {
@@ -359,7 +362,7 @@
                 localStorage.setItem('lg_import_products', JSON.stringify(products));
                 return true;
             } catch (e) {
-                alert('Error al guardar en el almacenamiento local.');
+                alert('El espacio de almacenamiento local está lleno. Probá subiendo archivos un poco más livianos.');
                 return false;
             }
         }
@@ -390,6 +393,61 @@
             document.getElementById('headerBgImage').style.backgroundImage = `url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=80')`;
             toggleAdminModal(false);
             showNotification('Fondo restaurado al predeterminado.', 'info');
+        }
+
+        // Carga múltiple directa de archivos desde el dispositivo
+        function handleLocalFilesInput(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                const isVideo = file.type.startsWith('video');
+                reader.onload = function(e) {
+                    currentEditingMedia.push({
+                        type: isVideo ? 'video' : 'image',
+                        url: e.target.result
+                    });
+                    renderMediaPreview();
+                }
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function renderMediaPreview() {
+            const container = document.getElementById('mediaPreviewContainer');
+            if (currentEditingMedia.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-neutral-500 col-span-4 text-center py-4">No hay archivos cargados aún.</p>`;
+                return;
+            }
+
+            container.innerHTML = currentEditingMedia.map((media, idx) => `
+                <div class="relative group bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800 h-24 flex items-center justify-center">
+                    ${media.type === 'video' ? '<i class="fa-solid fa-video text-coquettePink text-xl"></i>' : `<img src="${media.url}" class="w-full h-full object-cover">`}
+                    <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition flex flex-col justify-between p-1">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] bg-coquettePink text-white px-1.5 py-0.5 rounded font-bold">#${idx + 1}</span>
+                            <button type="button" onclick="removeMediaItem(${idx})" class="text-red-400 hover:text-red-200 text-xs px-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="flex justify-between">
+                            ${idx > 0 ? `<button type="button" onclick="moveMedia(${idx}, -1)" class="text-white text-xs bg-neutral-800 px-1.5 rounded">◀</button>` : '<span></span>'}
+                            ${idx < currentEditingMedia.length - 1 ? `<button type="button" onclick="moveMedia(${idx}, 1)" class="text-white text-xs bg-neutral-800 px-1.5 rounded">▶</button>` : '<span></span>'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeMediaItem(idx) {
+            currentEditingMedia.splice(idx, 1);
+            renderMediaPreview();
+        }
+
+        function moveMedia(idx, direction) {
+            const item = currentEditingMedia.splice(idx, 1)[0];
+            currentEditingMedia.splice(idx + direction, 0, item);
+            renderMediaPreview();
         }
 
         function updateCategoryDropdowns(selectedCat = '', selectedSub = '') {
@@ -656,20 +714,12 @@
                 subcategory = document.getElementById('prodSubcategoryNew').value.trim();
             }
 
-            const rawUrls = document.getElementById('prodMediaUrls').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
 
-            if (!rawUrls) {
-                alert('Debes ingresar al menos una URL de imagen o video.');
+            if (currentEditingMedia.length === 0) {
+                alert('Debes agregar al menos una foto o video.');
                 return;
             }
-
-            // Procesar las URLs separadas por comas o saltos de línea
-            const urlsArray = rawUrls.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
-            const mediaList = urlsArray.map(url => {
-                const isVid = url.endsWith('.mp4') || url.includes('video') || url.includes('.webm');
-                return { type: isVid ? 'video' : 'image', url: url };
-            });
 
             const newProd = { 
                 title, 
@@ -677,7 +727,7 @@
                 profit, 
                 category: category || 'General', 
                 subcategory, 
-                mediaList, 
+                mediaList: [...currentEditingMedia], 
                 description 
             };
 
@@ -702,6 +752,8 @@
             document.getElementById('productForm').reset();
             document.getElementById('editIndex').value = '-1';
             document.getElementById('submitBtn').innerText = 'Guardar Producto';
+            currentEditingMedia = [];
+            renderMediaPreview();
             updateCategoryDropdowns();
         }
 
@@ -740,9 +792,8 @@
             document.getElementById('prodProfit').value = p.profit || 0;
             document.getElementById('prodDesc').value = p.description || '';
             
-            // Cargar URLs en el textarea separadas por comas
-            const urlsStr = p.mediaList ? p.mediaList.map(m => m.url).join(', ') : '';
-            document.getElementById('prodMediaUrls').value = urlsStr;
+            currentEditingMedia = p.mediaList ? [...p.mediaList] : [];
+            renderMediaPreview();
 
             document.getElementById('submitBtn').innerText = 'Actualizar Producto';
             switchTab('manual');
