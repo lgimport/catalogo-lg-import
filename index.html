@@ -120,38 +120,32 @@
         </div>
     </main>
 
-    <!-- Modal Ficha de Producto (Estilo Referencia) -->
+    <!-- Modal Ficha de Producto -->
     <div id="productModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
         <div class="bg-neutral-950 text-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-neutral-800 relative max-h-[95vh] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             <button onclick="toggleProductModal(false)" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-xl w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center transition z-20">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- Columna Izquierda: Galería Multimedia -->
+            <!-- Galería Multimedia Izquierda -->
             <div class="space-y-4 flex flex-col justify-center">
-                <div id="modalMainMedia" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-black border border-neutral-800 flex items-center justify-center">
-                    <!-- Contenido principal dinámico -->
-                </div>
-                <div id="modalThumbsContainer" class="flex gap-2 overflow-x-auto pb-2">
-                    <!-- Miniaturas dinámicas -->
-                </div>
+                <div id="modalMainMedia" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-black border border-neutral-800 flex items-center justify-center"></div>
+                <div id="modalThumbsContainer" class="flex gap-2 overflow-x-auto pb-2"></div>
             </div>
 
-            <!-- Columna Derecha: Detalles, Precios y Compra -->
+            <!-- Detalles Derecha -->
             <div class="space-y-5 flex flex-col justify-between">
                 <div class="space-y-3">
                     <span id="modalCategoryTag" class="text-[10px] bg-neutral-900 text-coquettePink px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-neutral-800"></span>
                     <h2 id="modalTitle" class="text-2xl font-bold font-serif text-white leading-tight"></h2>
                     <p id="modalDesc" class="text-xs text-neutral-300 leading-relaxed whitespace-pre-line"></p>
 
-                    <!-- Caja de Precios Estilo Referencia -->
                     <div class="bg-neutral-900/90 border border-neutral-800 p-4 rounded-2xl space-y-2">
                         <div class="text-2xl sm:text-3xl font-extrabold text-white" id="modalListPrice"></div>
                         <div class="text-xs text-neutral-300" id="modalInstallmentText"></div>
                         <div class="text-sm font-bold text-coquettePink pt-1" id="modalTransferPrice"></div>
                     </div>
 
-                    <!-- Opciones de Talle y Color -->
                     <div class="space-y-3 pt-2">
                         <div>
                             <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Talle</label>
@@ -175,7 +169,6 @@
                     </div>
                 </div>
 
-                <!-- Botones de Acción Finales -->
                 <div class="space-y-3 pt-4 border-t border-neutral-800">
                     <button onclick="toggleProductModal(false)" class="w-full bg-neutral-900 hover:bg-neutral-800 text-neutral-300 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 border border-neutral-800 transition">
                         <i class="fa-solid fa-bag-shopping"></i> Seguir Comprando
@@ -295,7 +288,7 @@
                         </div>
                     </div>
 
-                    <!-- Carga Múltiple Directa -->
+                    <!-- Archivos Múltiples -->
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">Seleccionar Fotos y Videos (Múltiples) *</label>
                         <input type="file" id="prodLocalFiles" accept="image/*,video/*" multiple onchange="handleLocalFilesInput(event)" class="text-xs text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-800 file:text-white hover:file:bg-neutral-700 cursor-pointer mb-2">
@@ -387,7 +380,7 @@
             loadCustomBg();
             updateCategoryDropdowns();
             renderCategories();
-            renderProducts();
+            filterProducts(); // Muestra todos los productos al entrar por defecto
             updateCartCount();
         };
 
@@ -621,8 +614,11 @@
                     mediaHTML = `<img src="${primaryMedia.url}" alt="${product.title}" onerror="this.src='https://placehold.co/600x600/121212/ff69b4?text=LG+Import'" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500">`;
                 }
 
+                // Buscar el índice real en el array principal para que el modal abra el producto correcto incluso al filtrar por categoría
+                const realIndex = products.indexOf(product);
+
                 return `
-                    <div onclick="openProductModal(${pIndex})" class="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer">
+                    <div onclick="openProductModal(${realIndex})" class="bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer">
                         <div>
                             <div class="relative h-64 overflow-hidden bg-neutral-950">
                                 ${mediaHTML}
@@ -655,7 +651,6 @@
             }).join('');
         }
 
-        // Lógica de la Ficha de Producto (Modal)
         function openProductModal(index) {
             currentSelectedProduct = products[index];
             productQty = 1;
@@ -730,77 +725,6 @@
             text += `• Precio Listado (3 cuotas): $${subtotalList.toLocaleString()}\n`;
             text += `• Precio Transferencia (15% off): $${subtotalTransf.toLocaleString()}\n\n`;
             text += `¿Me confirmás stock disponible?`;
-
-            const encoded = encodeURIComponent(text);
-            window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
-        }
-
-        function addToCart(title, listPrice, transferPrice) {
-            cart.push({ title, listPrice, transferPrice });
-            updateCartCount();
-            showNotification(`¡"${title}" agregado al carrito!`, 'success');
-        }
-
-        function updateCartCount() {
-            document.getElementById('cartCount').innerText = cart.length;
-        }
-
-        function toggleCartModal(show) {
-            const modal = document.getElementById('cartModal');
-            if (show) {
-                renderCartItems();
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        function renderCartItems() {
-            const container = document.getElementById('cartItemsList');
-            document.getElementById('cartTotalItems').innerText = cart.length;
-
-            if (cart.length === 0) {
-                container.innerHTML = `<p class="text-xs text-neutral-400 text-center py-8">Tu carrito está vacío.</p>`;
-                return;
-            }
-
-            container.innerHTML = cart.map((item, idx) => `
-                <div class="py-3 flex justify-between items-center text-xs">
-                    <div>
-                        <h5 class="font-bold text-white">${item.title}</h5>
-                        <span class="text-neutral-400">Lista: $${item.listPrice.toLocaleString()} | Transf: $${item.transferPrice.toLocaleString()}</span>
-                    </div>
-                    <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
-            updateCartCount();
-            renderCartItems();
-        }
-
-        function checkoutWhatsApp() {
-            if (cart.length === 0) {
-                alert('El carrito está vacío.');
-                return;
-            }
-
-            let text = `Hola! Quiero cerrar este pedido y consultar stock: 🎀\n\n`;
-            let totalList = 0;
-            let totalTransf = 0;
-
-            cart.forEach((item, i) => {
-                text += `${i + 1}. *${item.title}*\n   - 3 Cuotas: $${item.listPrice.toLocaleString()}\n   - Transferencia: $${item.transferPrice.toLocaleString()}\n\n`;
-                totalList += item.listPrice;
-                totalTransf += item.transferPrice;
-            });
-
-            text += `--------------------------\n`;
-            text += `*Total 3 Cuotas:* $${totalList.toLocaleString()}\n`;
-            text += `*Total Transferencia (15% off):* $${totalTransf.toLocaleString()}\n`;
-            text += `\n¿Me confirmás stock disponible?`;
 
             const encoded = encodeURIComponent(text);
             window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
